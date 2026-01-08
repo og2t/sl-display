@@ -41,7 +41,7 @@
 
 body {
   font-family: "SL Gothic", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  background: linear-gradient(135deg, var(--bg) 0%, #0f3460 100%);
+  background: #000000;
   color: var(--text);
   min-height: 100vh;
   padding: 0;
@@ -80,9 +80,10 @@ body::before {
   width: 100vw;
   height: 100vh;
   margin: 0;
-  padding: 0;
+  padding: 10px;
   position: relative;
   z-index: 1;
+  box-sizing: border-box;
 }
 
 .stations-grid {
@@ -91,8 +92,10 @@ body::before {
   display: flex;
   -webkit-flex-wrap: wrap;
   flex-wrap: wrap;
-  width: 100vw;
-  height: 100vh;
+  -webkit-align-content: flex-start;
+  align-content: flex-start;
+  width: 100%;
+  height: 100%;
   margin: 0;
   padding: 0;
 }
@@ -103,8 +106,10 @@ body::before {
   flex: 0 0 50%;
   width: 50vw;
   height: 50vh;
-  padding: 10px;
+  padding: 5px;
   box-sizing: border-box;
+  -webkit-align-self: flex-start;
+  align-self: flex-start;
 }
 
 .left-column,
@@ -218,7 +223,7 @@ header {
 }
 
 .departures-container {
-  background: var(--card);
+  background: #111111;
   border-radius: 20px;
   padding: 20px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
@@ -485,26 +490,76 @@ header {
   transform: translateY(0);
 }
 
-@media (max-width: 600px) {
+@media (max-width: 767px) {
+  body {
+    overflow: auto;
+  }
+
+  .container {
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .stations-grid {
+    -webkit-flex-direction: column;
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .station-module {
+    -webkit-flex: 0 0 auto;
+    flex: 0 0 auto;
+    width: 100%;
+    height: auto;
+    min-height: 200px;
+  }
+
   .station-name {
-    font-size: 2rem;
-  }
-
-  .departure-item {
-    grid-template-columns: 60px 1fr 70px;
-    gap: 15px;
-    padding: 15px;
-  }
-
-  .line-number {
     font-size: 1.5rem;
   }
 
-  .destination {
-    font-size: 1rem;
+  .departures-container {
+    padding: 15px;
   }
 
-  .time {
-    font-size: 1.1rem;
+  .departure-item {
+    padding: 12px 15px;
+  }
+
+  .departure-item-main {
+    gap: 10px;
+  }
+
+  .departure-item-main .line-number {
+    -webkit-flex: 0 0 60px;
+    flex: 0 0 60px;
+    font-size: 1.5rem;
+  }
+
+  .departure-item-main .destination {
+    font-size: 0.9rem;
+  }
+
+  .departure-item-main .time-clock {
+    -webkit-flex: 0 0 70px;
+    flex: 0 0 70px;
+    font-size: 0.9rem;
+  }
+
+  .departure-item-main .time-minutes {
+    -webkit-flex: 0 0 80px;
+    flex: 0 0 80px;
+    font-size: 1.2rem;
+  }
+
+  .departure-info {
+    font-size: 0.75rem;
+    padding-left: 70px;
+  }
+
+  .refresh-btn {
+    font-size: 0.9rem;
+    padding: 12px 30px;
   }
 }
