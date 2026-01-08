@@ -51,13 +51,25 @@
             limit: 2,
           },
           {
-            name: "Stora Essingen Trams",
+            name: "Solna",
             siteId: 9811,
-            containerId: "departuresContainerTvarbanan",
+            containerId: "departuresContainerSickla",
             filters: {
               transportMode: "TRAM",
+              excludeDestination: "Sickla",
             },
-            limit: 5,
+            limit: 3,
+            urgentThreshold: 5,
+          },
+          {
+            name: "Sickla",
+            siteId: 9811,
+            containerId: "departuresContainerNacka",
+            filters: {
+              transportMode: "TRAM",
+              excludeDestination: "Solna station",
+            },
+            limit: 3,
             urgentThreshold: 5,
           },
         ],
@@ -76,7 +88,9 @@
       function parseISODate(isoString) {
         // Manual parsing for iOS 9.3.5 compatibility
         // Expected format: 2025-01-08T10:30:00+01:00 or 2025-01-08T10:30:00Z
-        var parts = isoString.match(/(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})/);
+        var parts = isoString.match(
+          /(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})/
+        );
         if (!parts) return new Date(isoString);
 
         var year = parseInt(parts[1], 10);
@@ -89,7 +103,7 @@
         // Check for timezone offset
         var tzMatch = isoString.match(/([+-])(\d{2}):(\d{2})$/);
         if (tzMatch) {
-          var tzSign = tzMatch[1] === '+' ? -1 : 1;
+          var tzSign = tzMatch[1] === "+" ? -1 : 1;
           var tzHours = parseInt(tzMatch[2], 10);
           var tzMinutes = parseInt(tzMatch[3], 10);
           var tzOffset = tzSign * (tzHours * 60 + tzMinutes);
@@ -231,25 +245,11 @@
 
       function initializeStations() {
         var grid = document.getElementById("stationsGrid");
+        var html = "";
 
-        var leftColumnHTML = '<div class="left-column">';
-        leftColumnHTML +=
-          '<div class="station-module">' +
-          '<h1 class="station-name">' +
-          CONFIG.stations[0].name +
-          "</h1>" +
-          '<div class="departures-container" id="' +
-          CONFIG.stations[0].containerId +
-          '">' +
-          '<div class="loading">Hämtar avgångar</div>' +
-          "</div>" +
-          "</div>";
-        leftColumnHTML += "</div>";
-
-        var rightColumnHTML = '<div class="right-column">';
-        for (var i = 1; i < CONFIG.stations.length; i++) {
+        for (var i = 0; i < CONFIG.stations.length; i++) {
           var station = CONFIG.stations[i];
-          rightColumnHTML +=
+          html +=
             '<div class="station-module">' +
             '<h1 class="station-name">' +
             station.name +
@@ -261,11 +261,11 @@
             "</div>" +
             "</div>";
         }
-        rightColumnHTML +=
-          '<button class="refresh-btn" id="refreshBtn" onclick="fetchDepartures()">Uppdatera</button>';
-        rightColumnHTML += "</div>";
 
-        grid.innerHTML = leftColumnHTML + rightColumnHTML;
+        html +=
+          '<button class="refresh-btn" id="refreshBtn" onclick="fetchDepartures()">Uppdatera</button>';
+
+        grid.innerHTML = html;
       }
 
       initializeStations();
