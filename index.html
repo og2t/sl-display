@@ -27,66 +27,63 @@
     <script>
       // ==================== CONFIGURATION ====================
 
-      const CONFIG = {
+      var CONFIG = {
         stations: [
           {
             name: "Flottbrovägen → City",
             siteId: 1285,
             containerId: "departuresContainerDeparturesBus",
             filters: {
-              // lineNumber: "1",
               transportMode: "BUS",
-              excludeDestination: "stora essingen",
+              excludeDestination: "stora essingen"
             },
             limit: 5,
-            urgentThreshold: 1, // Show red alert when ≤ 1 minute away
+            urgentThreshold: 1
           },
           {
             name: "City → Flottbrovägen",
             siteId: 1285,
             containerId: "departuresContainerArrivalsBus",
             filters: {
-              // lineNumber: "1",
               transportMode: "BUS",
-              excludeDestination: "frihamnen",
+              excludeDestination: "frihamnen"
             },
-            limit: 2,
+            limit: 2
           },
           {
             name: "Stora Essingen Trams",
             siteId: 9811,
             containerId: "departuresContainerTvarbanan",
             filters: {
-              transportMode: "TRAM",
+              transportMode: "TRAM"
             },
             limit: 5,
-            urgentThreshold: 5, // Show red alert when ≤ 5 minutes away
-          },
+            urgentThreshold: 5
+          }
         ],
 
         display: {
-          autoRefreshIntervalMs: 30000, // Auto-refresh every 30 seconds
-        },
+          autoRefreshIntervalMs: 30000
+        }
       };
 
       // ==================== END CONFIGURATION ====================
 
-      let autoRefreshInterval;
+      var autoRefreshInterval;
 
       // ==================== UTILITY FUNCTIONS ====================
 
       function formatTimeDisplay(expectedTime) {
-        const now = new Date();
-        const diffMinutes = Math.round((expectedTime - now) / 60000);
-        const clockTime = expectedTime.toLocaleTimeString("sv-SE", {
-          hour: "2-digit",
-          minute: "2-digit",
-        });
+        var now = new Date();
+        var diffMinutes = Math.round((expectedTime - now) / 60000);
+        var hours = expectedTime.getHours();
+        var minutes = expectedTime.getMinutes();
+        var clockTime = (hours < 10 ? "0" : "") + hours + ":" + (minutes < 10 ? "0" : "") + minutes;
 
         if (diffMinutes <= 0) {
-          return `<div class="time-clock">${clockTime}</div><div class="time-minutes">NU</div>`;
+          return '<div class="time-clock">' + clockTime + '</div><div class="time-minutes">NU</div>';
         } else {
-          return `<div class="time-clock">${clockTime}</div><div class="time-minutes">${diffMinutes} min</div>`;
+          return '<div class="time-clock">' + clockTime + '</div><div class="time-minutes">' + diffMinutes + ' min</div>';
         }
       }
 
@@ -95,87 +92,61 @@
       }
 
       function buildDepartureInfo(departure) {
-        const infoItems = [];
+        var infoItems = [];
 
-        // Add via information if present
         if (departure.via) {
-          infoItems.push(`<span class="via">via ${departure.via}</span>`);
+          infoItems.push('<span class="via">via ' + departure.via + '</span>');
         }
 
-        // Add delay information
-        const expectedTime = new Date(departure.expected);
-        const scheduledTime = new Date(departure.scheduled);
-        const delayMinutes = calculateDelay(expectedTime, scheduledTime);
+        var expectedTime = new Date(departure.expected);
+        var scheduledTime = new Date(departure.scheduled);
+        var delayMinutes = calculateDelay(expectedTime, scheduledTime);
 
         if (delayMinutes > 0) {
-          infoItems.push(
-            `<span class="deviation">Försenad ${delayMinutes} min</span>`
-          );
+          infoItems.push('<span class="deviation">Försenad ' + delayMinutes + ' min</span>');
         } else if (delayMinutes < 0) {
-          infoItems.push(`<span>Tidig ${Math.abs(delayMinutes)} min</span>`);
+          infoItems.push('<span>Tidig ' + Math.abs(delayMinutes) + ' min</span>');
         }
 
-        // Add deviation/disruption information
-        if (
-          departure.deviations &&
-          typeof departure.deviations === "string" &&
-          departure.deviations.trim()
-        ) {
-          infoItems.push(
-            `<span class="deviation">${departure.deviations}</span>`
-          );
+        if (departure.deviations && typeof departure.deviations === "string" && departure.deviations.trim()) {
+          infoItems.push('<span class="deviation">' + departure.deviations + '</span>');
         }
 
-        // Add journey state information
         if (departure.journey && departure.journey.state) {
-          const stateMessages = {
+          var stateMessages = {
             CANCELLED: "Inställd",
-            REPLACEMENT: "Ersättningstrafik",
+            REPLACEMENT: "Ersättningstrafik"
           };
           if (stateMessages[departure.journey.state]) {
-            infoItems.push(
-              `<span class="deviation">${
-                stateMessages[departure.journey.state]
-              }</span>`
-            );
+            infoItems.push('<span class="deviation">' + stateMessages[departure.journey.state] + '</span>');
           }
         }
 
         return {
           html: infoItems.length > 0 ? infoItems.join(" • ") : "",
-          hasDelay: delayMinutes > 0,
+          hasDelay: delayMinutes > 0
         };
       }
 
       function renderDepartureItem(departure, station) {
-        const expectedTime = new Date(departure.expected);
-        const now = new Date();
-        const diffMinutes = Math.round((expectedTime - now) / 60000);
+        var expectedTime = new Date(departure.expected);
+        var now = new Date();
+        var diffMinutes = Math.round((expectedTime - now) / 60000);
 
-        const timeDisplay = formatTimeDisplay(expectedTime);
-        const info = buildDepartureInfo(departure);
+        var timeDisplay = formatTimeDisplay(expectedTime);
+        var info = buildDepartureInfo(departure);
 
-        // Determine if departure is urgent based on station's urgentThreshold
-        const isUrgent =
-          station.urgentThreshold !== undefined &&
-          diffMinutes <= station.urgentThreshold;
+        var isUrgent = station.urgentThreshold !== undefined && diffMinutes <= station.urgentThreshold;
 
-        // Only render info div if there's content
-        const infoHTML = info.html
-          ? `<div class="departure-info${info.hasDelay ? " has-delay" : ""}">${
-              info.html
-            }</div>`
-          : "";
+        var infoHTML = info.html ? '<div class="departure-info' + (info.hasDelay ? ' has-delay' : '') + '">' + info.html + '</div>' : '';
 
-        return `
-        <div class="departure-item${isUrgent ? " urgent" : ""} fade-in">
-          <div class="departure-item-main">
-            <div class="line-number">${departure.line.designation}</div>
-            <div class="destination">${departure.destination}</div>
-            ${timeDisplay}
-          </div>${infoHTML ? "\n          " + infoHTML : ""}
-        </div>
-      `;
+        return '<div class="departure-item' + (isUrgent ? ' urgent' : '') + ' fade-in">' +
+          '<div class="departure-item-main">' +
+          '<div class="line-number">' + departure.line.designation + '</div>' +
+          '<div class="destination">' + departure.destination + '</div>' +
+          timeDisplay +
+          '</div>' + (infoHTML ? '\n          ' + infoHTML : '') +
+          '</div>';
       }
 
       // ==================== END UTILITY FUNCTIONS ====================
@@ -183,43 +154,37 @@
       // ==================== INITIALIZATION ====================
 
       function initializeStations() {
-        const grid = document.getElementById("stationsGrid");
-        const stationsHTML = CONFIG.stations
-          .map(
-            (station) => `
-          <div class="station-module">
-            <header>
-              <h1 class="station-name">${station.name}</h1>
-            </header>
-            <div class="departures-container" id="${station.containerId}">
-              <div class="loading">Hämtar avgångar</div>
-            </div>
-          </div>
-        `
-          )
-          .join("");
+        var grid = document.getElementById("stationsGrid");
+        var stationsHTML = "";
 
-        const buttonHTML = `
-          <button class="refresh-btn" id="refreshBtn" onclick="fetchDepartures()">
-            Uppdatera
-          </button>
-        `;
+        for (var i = 0; i < CONFIG.stations.length; i++) {
+          var station = CONFIG.stations[i];
+          stationsHTML += '<div class="station-module">' +
+            '<header>' +
+            '<h1 class="station-name">' + station.name + '</h1>' +
+            '</header>' +
+            '<div class="departures-container" id="' + station.containerId + '">' +
+            '<div class="loading">Hämtar avgångar</div>' +
+            '</div>' +
+            '</div>';
+        }
+
+        var buttonHTML = '<button class="refresh-btn" id="refreshBtn" onclick="fetchDepartures()">Uppdatera</button>';
 
         grid.innerHTML = stationsHTML + buttonHTML;
       }
 
-      // Initialize stations on page load
       initializeStations();
 
       // ==================== END INITIALIZATION ====================
 
-      let countdownInterval;
-      let secondsUntilRefresh = 0;
+      var countdownInterval;
+      var secondsUntilRefresh = 0;
 
       function updateButtonCountdown() {
-        const btn = document.getElementById("refreshBtn");
+        var btn = document.getElementById("refreshBtn");
         if (secondsUntilRefresh > 0) {
-          btn.innerHTML = `Nästa uppdatering om <span class="countdown-timer">${secondsUntilRefresh}</span>s`;
+          btn.innerHTML = 'Nästa uppdatering om <span class="countdown-timer">' + secondsUntilRefresh + '</span>s';
           secondsUntilRefresh--;
         } else {
           btn.textContent = "Uppdaterar...";
@@ -229,141 +194,137 @@
       function startCountdown() {
         secondsUntilRefresh = CONFIG.display.autoRefreshIntervalMs / 1000;
 
-        // Clear any existing countdown
         if (countdownInterval) {
           clearInterval(countdownInterval);
         }
 
-        // Update immediately
         updateButtonCountdown();
-
-        // Then update every second
         countdownInterval = setInterval(updateButtonCountdown, 1000);
       }
 
-      async function fetchStationDepartures(station) {
-        const container = document.getElementById(station.containerId);
+      function fetchStationDepartures(station, callback) {
+        var container = document.getElementById(station.containerId);
 
-        try {
-          const response = await fetch(
-            `https://transport.integration.sl.se/v1/sites/${station.siteId}/departures`
-          );
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "https://transport.integration.sl.se/v1/sites/" + station.siteId + "/departures", true);
 
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
+        xhr.onreadystatechange = function() {
+          if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+              try {
+                var data = JSON.parse(xhr.responseText);
+                var filteredDepartures = data.departures;
 
-          const data = await response.json();
+                if (station.filters.lineNumber) {
+                  var temp = [];
+                  for (var i = 0; i < filteredDepartures.length; i++) {
+                    if (filteredDepartures[i].line.designation === station.filters.lineNumber) {
+                      temp.push(filteredDepartures[i]);
+                    }
+                  }
+                  filteredDepartures = temp;
+                }
 
-          // Filter departures based on station configuration
-          let filteredDepartures = data.departures;
+                if (station.filters.transportMode) {
+                  var temp = [];
+                  for (var i = 0; i < filteredDepartures.length; i++) {
+                    if (filteredDepartures[i].line.transport_mode === station.filters.transportMode) {
+                      temp.push(filteredDepartures[i]);
+                    }
+                  }
+                  filteredDepartures = temp;
+                }
 
-          if (station.filters.lineNumber) {
-            filteredDepartures = filteredDepartures.filter(
-              (dep) => dep.line.designation === station.filters.lineNumber
-            );
-          }
+                if (station.filters.excludeDestination) {
+                  var temp = [];
+                  for (var i = 0; i < filteredDepartures.length; i++) {
+                    if (filteredDepartures[i].destination.toLowerCase().indexOf(station.filters.excludeDestination.toLowerCase()) === -1) {
+                      temp.push(filteredDepartures[i]);
+                    }
+                  }
+                  filteredDepartures = temp;
+                }
 
-          if (station.filters.transportMode) {
-            filteredDepartures = filteredDepartures.filter(
-              (dep) => dep.line.transport_mode === station.filters.transportMode
-            );
-          }
+                filteredDepartures = filteredDepartures.slice(0, station.limit);
 
-          if (station.filters.excludeDestination) {
-            filteredDepartures = filteredDepartures.filter(
-              (dep) =>
-                !dep.destination
-                  .toLowerCase()
-                  .includes(station.filters.excludeDestination.toLowerCase())
-            );
-          }
+                if (filteredDepartures.length === 0) {
+                  container.innerHTML = '<div class="error">Inga avgångar hittades</div>';
+                  if (callback) callback();
+                  return;
+                }
 
-          filteredDepartures = filteredDepartures.slice(0, station.limit);
+                var newHTML = "";
+                for (var i = 0; i < filteredDepartures.length; i++) {
+                  var html = renderDepartureItem(filteredDepartures[i], station);
+                  html = html.replace('class="departure-item fade-in"', 'class="departure-item fade-in" style="animation-delay: ' + (i * 0.1) + 's"');
+                  newHTML += html;
+                }
 
-          if (filteredDepartures.length === 0) {
-            container.innerHTML =
-              '<div class="error">Inga avgångar hittades</div>';
-            return;
-          }
+                var existingItems = container.querySelectorAll(".departure-item");
 
-          // Generate HTML using utility function
-          const newHTML = filteredDepartures
-            .map((dep, index) => {
-              const html = renderDepartureItem(dep, station);
-              // Add inline style for staggered animation delay
-              return html.replace(
-                'class="departure-item fade-in"',
-                `class="departure-item fade-in" style="animation-delay: ${
-                  index * 0.1
-                }s"`
-              );
-            })
-            .join("");
-
-          // Smooth transition: fade out old items, then fade in new ones
-          const existingItems = container.querySelectorAll(".departure-item");
-
-          if (existingItems.length > 0) {
-            // Fade out existing items
-            existingItems.forEach((item) => item.classList.add("fade-out"));
-
-            // Wait for fade out to complete, then replace content
-            await new Promise((resolve) => setTimeout(resolve, 300));
-            container.innerHTML = newHTML;
-          } else {
-            // First load - show loading state briefly
-            const isFirstLoad = !container.querySelector(".error");
-            if (isFirstLoad) {
-              container.innerHTML =
-                '<div class="loading">Hämtar avgångar</div>';
-              await new Promise((resolve) => setTimeout(resolve, 200));
+                if (existingItems.length > 0) {
+                  for (var i = 0; i < existingItems.length; i++) {
+                    existingItems[i].classList.add("fade-out");
+                  }
+                  setTimeout(function() {
+                    container.innerHTML = newHTML;
+                    if (callback) callback();
+                  }, 300);
+                } else {
+                  var isFirstLoad = !container.querySelector(".error");
+                  if (isFirstLoad) {
+                    container.innerHTML = '<div class="loading">Hämtar avgångar</div>';
+                    setTimeout(function() {
+                      container.innerHTML = newHTML;
+                      if (callback) callback();
+                    }, 200);
+                  } else {
+                    container.innerHTML = newHTML;
+                    if (callback) callback();
+                  }
+                }
+              } catch (e) {
+                container.innerHTML = '<div class="error"><strong>Kunde inte hämta avgångar</strong><br>Parse error</div>';
+                if (callback) callback();
+              }
+            } else {
+              container.innerHTML = '<div class="error"><strong>Kunde inte hämta avgångar</strong><br>HTTP error: ' + xhr.status + '</div>';
+              if (callback) callback();
             }
-            container.innerHTML = newHTML;
           }
-        } catch (error) {
-          console.error(
-            `Error fetching departures for ${station.name}:`,
-            error
-          );
-          container.innerHTML = `
-          <div class="error">
-            <strong>Kunde inte hämta avgångar</strong><br>
-            ${error.message}
-          </div>
-        `;
-        }
+        };
+
+        xhr.send();
       }
 
-      async function fetchDepartures() {
-        // Stop countdown while fetching
+      function fetchDepartures() {
         if (countdownInterval) {
           clearInterval(countdownInterval);
         }
 
-        const btn = document.getElementById("refreshBtn");
+        var btn = document.getElementById("refreshBtn");
         btn.textContent = "Uppdaterar...";
 
-        // Fetch departures for all configured stations
-        await Promise.all(
-          CONFIG.stations.map((station) => fetchStationDepartures(station))
-        );
+        var completed = 0;
+        var total = CONFIG.stations.length;
 
-        // Start countdown for next refresh
-        startCountdown();
+        function onStationComplete() {
+          completed++;
+          if (completed === total) {
+            startCountdown();
+          }
+        }
+
+        for (var i = 0; i < CONFIG.stations.length; i++) {
+          fetchStationDepartures(CONFIG.stations[i], onStationComplete);
+        }
       }
 
-      // Initial fetch
       fetchDepartures();
 
-      // Auto-refresh
-      autoRefreshInterval = setInterval(
-        fetchDepartures,
-        CONFIG.display.autoRefreshIntervalMs
-      );
+      autoRefreshInterval = setInterval(fetchDepartures, CONFIG.display.autoRefreshIntervalMs);
 
-      // Clean up on page unload
-      window.addEventListener("beforeunload", () => {
+      window.addEventListener("beforeunload", function() {
         clearInterval(autoRefreshInterval);
       });
     </script>
