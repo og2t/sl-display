@@ -16,36 +16,12 @@
       rel="apple-touch-icon"
       href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%231A1A2E' width='180' height='180'/><circle cx='90' cy='60' r='25' fill='%23FF6B35'/><rect x='65' y='90' width='50' height='60' rx='8' fill='%23F7931E'/><rect x='70' y='100' width='18' height='18' fill='%231A1A2E'/><rect x='92' y='100' width='18' height='18' fill='%231A1A2E'/><rect x='70' y='125' width='18' height='18' fill='%231A1A2E'/><rect x='92' y='125' width='18' height='18' fill='%231A1A2E'/></svg>"
     />
-    <title>Buss 1 - Flottbrovägen | Tvärbanan - Stora Essingen</title>
+    <title>SL Board</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <div class="container">
-      <div class="stations-grid">
-        <div class="station-module">
-          <header>
-            <h1 class="station-name">Flottbrovägen</h1>
-          </header>
-
-          <div class="departures-container" id="departuresContainer">
-            <div class="loading">Hämtar avgångar</div>
-          </div>
-        </div>
-
-        <div class="station-module">
-          <header>
-            <h1 class="station-name">Stora Essingen</h1>
-          </header>
-
-          <div class="departures-container" id="departuresContainerTvarbanan">
-            <div class="loading">Hämtar avgångar</div>
-          </div>
-        </div>
-      </div>
-
-      <button class="refresh-btn" id="refreshBtn" onclick="fetchDepartures()">
-        Uppdatera
-      </button>
+      <div class="stations-grid" id="stationsGrid"></div>
     </div>
 
     <script>
@@ -54,11 +30,11 @@
       const CONFIG = {
         stations: [
           {
-            name: "Flottbrovägen",
+            name: "Flottbrovägen → City",
             siteId: 1285,
-            containerId: "departuresContainer",
+            containerId: "departuresContainerDeparturesBus",
             filters: {
-              lineNumber: "1",
+              // lineNumber: "1",
               transportMode: "BUS",
               excludeDestination: "stora essingen",
             },
@@ -66,7 +42,18 @@
             urgentThreshold: 1, // Show red alert when ≤ 1 minute away
           },
           {
-            name: "Stora Essingen",
+            name: "City → Flottbrovägen",
+            siteId: 1285,
+            containerId: "departuresContainerArrivalsBus",
+            filters: {
+              // lineNumber: "1",
+              transportMode: "BUS",
+              excludeDestination: "frihamnen",
+            },
+            limit: 2,
+          },
+          {
+            name: "Stora Essingen Trams",
             siteId: 9811,
             containerId: "departuresContainerTvarbanan",
             filters: {
@@ -192,6 +179,39 @@
       }
 
       // ==================== END UTILITY FUNCTIONS ====================
+
+      // ==================== INITIALIZATION ====================
+
+      function initializeStations() {
+        const grid = document.getElementById("stationsGrid");
+        const stationsHTML = CONFIG.stations
+          .map(
+            (station) => `
+          <div class="station-module">
+            <header>
+              <h1 class="station-name">${station.name}</h1>
+            </header>
+            <div class="departures-container" id="${station.containerId}">
+              <div class="loading">Hämtar avgångar</div>
+            </div>
+          </div>
+        `
+          )
+          .join("");
+
+        const buttonHTML = `
+          <button class="refresh-btn" id="refreshBtn" onclick="fetchDepartures()">
+            Uppdatera
+          </button>
+        `;
+
+        grid.innerHTML = stationsHTML + buttonHTML;
+      }
+
+      // Initialize stations on page load
+      initializeStations();
+
+      // ==================== END INITIALIZATION ====================
 
       let countdownInterval;
       let secondsUntilRefresh = 0;

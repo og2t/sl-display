@@ -65,12 +65,31 @@ body::before {
 .stations-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto auto;
   gap: 15px;
   margin-bottom: 20px;
 }
 
 .station-module {
   min-width: 0;
+}
+
+/* First station: top-left */
+.station-module:nth-child(1) {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+/* Second station: bottom-left */
+.station-module:nth-child(2) {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+/* Third station: top-right */
+.station-module:nth-child(3) {
+  grid-column: 2;
+  grid-row: 1;
 }
 
 /* iPad mini specific optimizations (768px x 1024px) */
@@ -113,6 +132,27 @@ body::before {
 @media (max-width: 767px) {
   .stations-grid {
     grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto auto;
+  }
+
+  .station-module:nth-child(1) {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .station-module:nth-child(2) {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .station-module:nth-child(3) {
+    grid-column: 1;
+    grid-row: 3;
+  }
+
+  .refresh-btn {
+    grid-column: 1;
+    grid-row: 4;
   }
 }
 
@@ -157,6 +197,9 @@ header {
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(10px);
   animation: fadeIn 0.8s ease-out 0.2s both;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 @keyframes fadeIn {
@@ -174,7 +217,6 @@ header {
   display: flex;
   flex-direction: column;
   padding: 15px 20px;
-  margin-bottom: 12px;
   background: rgba(255, 255, 255, 0.02);
   border-left: 4px solid #4caf50;
   transition: all 0.3s ease;
@@ -362,8 +404,11 @@ header {
 }
 
 .refresh-btn {
-  display: block;
-  margin: 0 auto;
+  grid-column: 2;
+  grid-row: 2;
+  align-self: start;
+  justify-self: center;
+  width: fit-content;
   padding: 15px 40px;
   background: var(--secondary);
   color: var(--text);
