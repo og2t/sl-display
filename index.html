@@ -35,10 +35,10 @@
             containerId: "departuresContainerDeparturesBus",
             filters: {
               transportMode: "BUS",
-              excludeDestination: "stora essingen"
+              excludeDestination: "stora essingen",
             },
             limit: 5,
-            urgentThreshold: 1
+            urgentThreshold: 1,
           },
           {
             name: "City → Flottbrovägen",
@@ -46,25 +46,25 @@
             containerId: "departuresContainerArrivalsBus",
             filters: {
               transportMode: "BUS",
-              excludeDestination: "frihamnen"
+              excludeDestination: "frihamnen",
             },
-            limit: 2
+            limit: 2,
           },
           {
             name: "Stora Essingen Trams",
             siteId: 9811,
             containerId: "departuresContainerTvarbanan",
             filters: {
-              transportMode: "TRAM"
+              transportMode: "TRAM",
             },
             limit: 5,
-            urgentThreshold: 5
-          }
+            urgentThreshold: 5,
+          },
         ],
 
         display: {
-          autoRefreshIntervalMs: 30000
-        }
+          autoRefreshIntervalMs: 30000,
+        },
       };
 
       // ==================== END CONFIGURATION ====================
@@ -78,12 +78,27 @@
         var diffMinutes = Math.round((expectedTime - now) / 60000);
         var hours = expectedTime.getHours();
         var minutes = expectedTime.getMinutes();
-        var clockTime = (hours < 10 ? "0" : "") + hours + ":" + (minutes < 10 ? "0" : "") + minutes;
+        var clockTime =
+          (hours < 10 ? "0" : "") +
+          hours +
+          ":" +
+          (minutes < 10 ? "0" : "") +
+          minutes;
 
         if (diffMinutes <= 0) {
-          return '<div class="time-clock">' + clockTime + '</div><div class="time-minutes">NU</div>';
+          return (
+            '<div class="time-clock">' +
+            clockTime +
+            '</div><div class="time-minutes">NU</div>'
+          );
         } else {
-          return '<div class="time-clock">' + clockTime + '</div><div class="time-minutes">' + diffMinutes + ' min</div>';
+          return (
+            '<div class="time-clock">' +
+            clockTime +
+            '</div><div class="time-minutes">' +
+            diffMinutes +
+            " min</div>"
+          );
         }
       }
 
@@ -95,7 +110,7 @@
         var infoItems = [];
 
         if (departure.via) {
-          infoItems.push('<span class="via">via ' + departure.via + '</span>');
+          infoItems.push('<span class="via">via ' + departure.via + "</span>");
         }
 
         var expectedTime = new Date(departure.expected);
@@ -103,28 +118,42 @@
         var delayMinutes = calculateDelay(expectedTime, scheduledTime);
 
         if (delayMinutes > 0) {
-          infoItems.push('<span class="deviation">Försenad ' + delayMinutes + ' min</span>');
+          infoItems.push(
+            '<span class="deviation">Försenad ' + delayMinutes + " min</span>"
+          );
         } else if (delayMinutes < 0) {
-          infoItems.push('<span>Tidig ' + Math.abs(delayMinutes) + ' min</span>');
+          infoItems.push(
+            "<span>Tidig " + Math.abs(delayMinutes) + " min</span>"
+          );
         }
 
-        if (departure.deviations && typeof departure.deviations === "string" && departure.deviations.trim()) {
-          infoItems.push('<span class="deviation">' + departure.deviations + '</span>');
+        if (
+          departure.deviations &&
+          typeof departure.deviations === "string" &&
+          departure.deviations.trim()
+        ) {
+          infoItems.push(
+            '<span class="deviation">' + departure.deviations + "</span>"
+          );
         }
 
         if (departure.journey && departure.journey.state) {
           var stateMessages = {
             CANCELLED: "Inställd",
-            REPLACEMENT: "Ersättningstrafik"
+            REPLACEMENT: "Ersättningstrafik",
           };
           if (stateMessages[departure.journey.state]) {
-            infoItems.push('<span class="deviation">' + stateMessages[departure.journey.state] + '</span>');
+            infoItems.push(
+              '<span class="deviation">' +
+                stateMessages[departure.journey.state] +
+                "</span>"
+            );
           }
         }
 
         return {
           html: infoItems.length > 0 ? infoItems.join(" • ") : "",
-          hasDelay: delayMinutes > 0
+          hasDelay: delayMinutes > 0,
         };
       }
 
@@ -136,17 +165,34 @@
         var timeDisplay = formatTimeDisplay(expectedTime);
         var info = buildDepartureInfo(departure);
 
-        var isUrgent = station.urgentThreshold !== undefined && diffMinutes <= station.urgentThreshold;
+        var isUrgent =
+          station.urgentThreshold !== undefined &&
+          diffMinutes <= station.urgentThreshold;
 
-        var infoHTML = info.html ? '<div class="departure-info' + (info.hasDelay ? ' has-delay' : '') + '">' + info.html + '</div>' : '';
+        var infoHTML = info.html
+          ? '<div class="departure-info' +
+            (info.hasDelay ? " has-delay" : "") +
+            '">' +
+            info.html +
+            "</div>"
+          : "";
 
-        return '<div class="departure-item' + (isUrgent ? ' urgent' : '') + ' fade-in">' +
+        return (
+          '<div class="departure-item' +
+          (isUrgent ? " urgent" : "") +
+          ' fade-in">' +
           '<div class="departure-item-main">' +
-          '<div class="line-number">' + departure.line.designation + '</div>' +
-          '<div class="destination">' + departure.destination + '</div>' +
+          '<div class="line-number">' +
+          departure.line.designation +
+          "</div>" +
+          '<div class="destination">' +
+          departure.destination +
+          "</div>" +
           timeDisplay +
-          '</div>' + (infoHTML ? '\n          ' + infoHTML : '') +
-          '</div>';
+          "</div>" +
+          (infoHTML ? "\n          " + infoHTML : "") +
+          "</div>"
+        );
       }
 
       // ==================== END UTILITY FUNCTIONS ====================
@@ -155,23 +201,41 @@
 
       function initializeStations() {
         var grid = document.getElementById("stationsGrid");
-        var stationsHTML = "";
 
-        for (var i = 0; i < CONFIG.stations.length; i++) {
+        var leftColumnHTML = '<div class="left-column">';
+        leftColumnHTML +=
+          '<div class="station-module">' +
+          '<h1 class="station-name">' +
+          CONFIG.stations[0].name +
+          "</h1>" +
+          '<div class="departures-container" id="' +
+          CONFIG.stations[0].containerId +
+          '">' +
+          '<div class="loading">Hämtar avgångar</div>' +
+          "</div>" +
+          "</div>";
+        leftColumnHTML += "</div>";
+
+        var rightColumnHTML = '<div class="right-column">';
+        for (var i = 1; i < CONFIG.stations.length; i++) {
           var station = CONFIG.stations[i];
-          stationsHTML += '<div class="station-module">' +
-            '<header>' +
-            '<h1 class="station-name">' + station.name + '</h1>' +
-            '</header>' +
-            '<div class="departures-container" id="' + station.containerId + '">' +
+          rightColumnHTML +=
+            '<div class="station-module">' +
+            '<h1 class="station-name">' +
+            station.name +
+            "</h1>" +
+            '<div class="departures-container" id="' +
+            station.containerId +
+            '">' +
             '<div class="loading">Hämtar avgångar</div>' +
-            '</div>' +
-            '</div>';
+            "</div>" +
+            "</div>";
         }
+        rightColumnHTML +=
+          '<button class="refresh-btn" id="refreshBtn" onclick="fetchDepartures()">Uppdatera</button>';
+        rightColumnHTML += "</div>";
 
-        var buttonHTML = '<button class="refresh-btn" id="refreshBtn" onclick="fetchDepartures()">Uppdatera</button>';
-
-        grid.innerHTML = stationsHTML + buttonHTML;
+        grid.innerHTML = leftColumnHTML + rightColumnHTML;
       }
 
       initializeStations();
@@ -184,7 +248,10 @@
       function updateButtonCountdown() {
         var btn = document.getElementById("refreshBtn");
         if (secondsUntilRefresh > 0) {
-          btn.innerHTML = 'Nästa uppdatering om <span class="countdown-timer">' + secondsUntilRefresh + '</span>s';
+          btn.innerHTML =
+            'Nästa uppdatering om <span class="countdown-timer">' +
+            secondsUntilRefresh +
+            "</span>s";
           secondsUntilRefresh--;
         } else {
           btn.textContent = "Uppdaterar...";
@@ -206,9 +273,15 @@
         var container = document.getElementById(station.containerId);
 
         var xhr = new XMLHttpRequest();
-        xhr.open("GET", "https://transport.integration.sl.se/v1/sites/" + station.siteId + "/departures", true);
+        xhr.open(
+          "GET",
+          "https://transport.integration.sl.se/v1/sites/" +
+            station.siteId +
+            "/departures",
+          true
+        );
 
-        xhr.onreadystatechange = function() {
+        xhr.onreadystatechange = function () {
           if (xhr.readyState === 4) {
             if (xhr.status === 200) {
               try {
@@ -218,7 +291,10 @@
                 if (station.filters.lineNumber) {
                   var temp = [];
                   for (var i = 0; i < filteredDepartures.length; i++) {
-                    if (filteredDepartures[i].line.designation === station.filters.lineNumber) {
+                    if (
+                      filteredDepartures[i].line.designation ===
+                      station.filters.lineNumber
+                    ) {
                       temp.push(filteredDepartures[i]);
                     }
                   }
@@ -228,7 +304,10 @@
                 if (station.filters.transportMode) {
                   var temp = [];
                   for (var i = 0; i < filteredDepartures.length; i++) {
-                    if (filteredDepartures[i].line.transport_mode === station.filters.transportMode) {
+                    if (
+                      filteredDepartures[i].line.transport_mode ===
+                      station.filters.transportMode
+                    ) {
                       temp.push(filteredDepartures[i]);
                     }
                   }
@@ -238,7 +317,13 @@
                 if (station.filters.excludeDestination) {
                   var temp = [];
                   for (var i = 0; i < filteredDepartures.length; i++) {
-                    if (filteredDepartures[i].destination.toLowerCase().indexOf(station.filters.excludeDestination.toLowerCase()) === -1) {
+                    if (
+                      filteredDepartures[i].destination
+                        .toLowerCase()
+                        .indexOf(
+                          station.filters.excludeDestination.toLowerCase()
+                        ) === -1
+                    ) {
                       temp.push(filteredDepartures[i]);
                     }
                   }
@@ -248,33 +333,44 @@
                 filteredDepartures = filteredDepartures.slice(0, station.limit);
 
                 if (filteredDepartures.length === 0) {
-                  container.innerHTML = '<div class="error">Inga avgångar hittades</div>';
+                  container.innerHTML =
+                    '<div class="error">Inga avgångar hittades</div>';
                   if (callback) callback();
                   return;
                 }
 
                 var newHTML = "";
                 for (var i = 0; i < filteredDepartures.length; i++) {
-                  var html = renderDepartureItem(filteredDepartures[i], station);
-                  html = html.replace('class="departure-item fade-in"', 'class="departure-item fade-in" style="animation-delay: ' + (i * 0.1) + 's"');
+                  var html = renderDepartureItem(
+                    filteredDepartures[i],
+                    station
+                  );
+                  html = html.replace(
+                    'class="departure-item fade-in"',
+                    'class="departure-item fade-in" style="animation-delay: ' +
+                      i * 0.1 +
+                      's"'
+                  );
                   newHTML += html;
                 }
 
-                var existingItems = container.querySelectorAll(".departure-item");
+                var existingItems =
+                  container.querySelectorAll(".departure-item");
 
                 if (existingItems.length > 0) {
                   for (var i = 0; i < existingItems.length; i++) {
                     existingItems[i].classList.add("fade-out");
                   }
-                  setTimeout(function() {
+                  setTimeout(function () {
                     container.innerHTML = newHTML;
                     if (callback) callback();
                   }, 300);
                 } else {
                   var isFirstLoad = !container.querySelector(".error");
                   if (isFirstLoad) {
-                    container.innerHTML = '<div class="loading">Hämtar avgångar</div>';
-                    setTimeout(function() {
+                    container.innerHTML =
+                      '<div class="loading">Hämtar avgångar</div>';
+                    setTimeout(function () {
                       container.innerHTML = newHTML;
                       if (callback) callback();
                     }, 200);
@@ -284,11 +380,15 @@
                   }
                 }
               } catch (e) {
-                container.innerHTML = '<div class="error"><strong>Kunde inte hämta avgångar</strong><br>Parse error</div>';
+                container.innerHTML =
+                  '<div class="error"><strong>Kunde inte hämta avgångar</strong><br>Parse error</div>';
                 if (callback) callback();
               }
             } else {
-              container.innerHTML = '<div class="error"><strong>Kunde inte hämta avgångar</strong><br>HTTP error: ' + xhr.status + '</div>';
+              container.innerHTML =
+                '<div class="error"><strong>Kunde inte hämta avgångar</strong><br>HTTP error: ' +
+                xhr.status +
+                "</div>";
               if (callback) callback();
             }
           }
@@ -322,9 +422,12 @@
 
       fetchDepartures();
 
-      autoRefreshInterval = setInterval(fetchDepartures, CONFIG.display.autoRefreshIntervalMs);
+      autoRefreshInterval = setInterval(
+        fetchDepartures,
+        CONFIG.display.autoRefreshIntervalMs
+      );
 
-      window.addEventListener("beforeunload", function() {
+      window.addEventListener("beforeunload", function () {
         clearInterval(autoRefreshInterval);
       });
     </script>

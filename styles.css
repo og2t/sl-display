@@ -1,4 +1,26 @@
-@import url("https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;700&display=swap");
+@font-face {
+  font-family: "SL Gothic";
+  src: url("fonts/slgothictext2-regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SL Gothic";
+  src: url("fonts/slgothictext2-bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SL Gothic Display";
+  src: url("fonts/slgothicdisplay-bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: bold;
+  font-display: swap;
+}
 
 * {
   margin: 0;
@@ -18,7 +40,7 @@
 }
 
 body {
-  font-family: "DM Sans", sans-serif;
+  font-family: "SL Gothic", sans-serif;
   background: linear-gradient(135deg, var(--bg) 0%, #0f3460 100%);
   color: var(--text);
   min-height: 100vh;
@@ -63,33 +85,27 @@ body::before {
 }
 
 .stations-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: auto auto auto;
+  display: flex;
   gap: 15px;
   margin-bottom: 20px;
 }
 
 .station-module {
+  flex: 1;
   min-width: 0;
 }
 
-/* First station: top-left */
-.station-module:nth-child(1) {
-  grid-column: 1;
-  grid-row: 1;
+.right-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
-/* Second station: bottom-left */
-.station-module:nth-child(2) {
-  grid-column: 1;
-  grid-row: 2;
-}
-
-/* Third station: top-right */
-.station-module:nth-child(3) {
-  grid-column: 2;
-  grid-row: 1;
+.refresh-btn {
+  width: fit-content;
+  margin: 0 auto;
+  align-self: center;
 }
 
 /* iPad mini specific optimizations (768px x 1024px) */
@@ -174,7 +190,7 @@ header {
 }
 
 .station-name {
-  font-family: "Space Mono", monospace;
+  font-family: "SL Gothic Display", "SL Gothic", sans-serif;
   font-size: 2rem;
   font-weight: 700;
   color: var(--primary);
@@ -321,7 +337,7 @@ header {
 }
 
 .line-number {
-  font-family: "Space Mono", monospace;
+  font-family: "SL Gothic", sans-serif;
   font-size: 1.8rem;
   font-weight: 700;
   color: var(--accent);
@@ -334,14 +350,14 @@ header {
 }
 
 .time-clock {
-  font-family: "Space Mono", monospace;
+  font-family: "SL Gothic", sans-serif;
   font-size: 1.1rem;
   font-weight: 700;
   color: var(--text-dim);
 }
 
 .time-minutes {
-  font-family: "Space Mono", monospace;
+  font-family: "SL Gothic", sans-serif;
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--primary);
@@ -404,17 +420,15 @@ header {
 }
 
 .refresh-btn {
-  grid-column: 2;
-  grid-row: 2;
   align-self: start;
-  justify-self: center;
+  margin: 0 auto;
   width: fit-content;
   padding: 15px 40px;
   background: var(--secondary);
   color: var(--text);
   border: none;
   border-radius: 25px;
-  font-family: "DM Sans", sans-serif;
+  font-family: "SL Gothic", sans-serif;
   font-size: 1.1rem;
   font-weight: 600;
   cursor: pointer;
