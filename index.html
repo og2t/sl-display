@@ -30,7 +30,7 @@
       var CONFIG = {
         stations: [
           {
-            name: "Fridhemsplan",
+            name: "Flottbrovägen bussar",
             siteId: 1285,
             containerId: "departuresContainerDeparturesBus",
             filters: {
@@ -41,7 +41,7 @@
             urgentThreshold: 1,
           },
           {
-            name: "Torget",
+            name: "&nbsp;",
             siteId: 1285,
             containerId: "departuresContainerArrivalsBus",
             filters: {
@@ -51,18 +51,7 @@
             limit: 2,
           },
           {
-            name: "Solna",
-            siteId: 9811,
-            containerId: "departuresContainerSickla",
-            filters: {
-              transportMode: "TRAM",
-              excludeDestination: "Sickla",
-            },
-            limit: 3,
-            urgentThreshold: 5,
-          },
-          {
-            name: "Sickla",
+            name: "Stora Essingen tvärbanor",
             siteId: 9811,
             containerId: "departuresContainerNacka",
             filters: {
@@ -70,7 +59,16 @@
               excludeDestination: "Solna station",
             },
             limit: 3,
-            urgentThreshold: 5,
+          },
+          {
+            name: "&nbsp;",
+            siteId: 9811,
+            containerId: "departuresContainerSickla",
+            filters: {
+              transportMode: "TRAM",
+              excludeDestination: "Sickla",
+            },
+            limit: 3,
           },
         ],
 
