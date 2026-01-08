@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buss 1 - Flottbrovägen</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #FF6B35;
+            --secondary: #004E89;
+            --accent: #F7931E;
+            --bg: #1A1A2E;
+            --card: #16213E;
+            --text: #E8E8E8;
+            --text-dim: #A0A0A0;
+        }
+        
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: linear-gradient(135deg, var(--bg) 0%, #0F3460 100%);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,107,53,0.05) 0%, transparent 70%);
+            animation: pulse 15s ease-in-out infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(180deg); }
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .stations-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .station-module {
+            min-width: 0;
+        }
+        
+        @media (max-width: 900px) {
+            .stations-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: slideDown 0.6s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .station-name {
+            font-family: 'Space Mono', monospace;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-shadow: 0 0 20px rgba(255,107,53,0.3);
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+        
+        .line-badge {
+            display: inline-block;
+            background: var(--accent);
+            color: var(--bg);
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 15px rgba(247,147,30,0.4);
+        }
+        
+        .last-updated {
+            font-family: 'Space Mono', monospace;
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            margin-top: 15px;
+        }
+        
+        .departures-container {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.05);
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .departure-item {
+            display: grid;
+            grid-template-columns: 80px 1fr 80px;
+            gap: 20px;
+            align-items: center;
+            padding: 20px;
+            margin-bottom: 15px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 12px;
+            border-left: 4px solid var(--primary);
+            transition: all 0.3s ease;
+            animation: slideInLeft 0.5s ease-out both;
+        }
+        
+        .departure-item:nth-child(1) { animation-delay: 0.3s; }
+        .departure-item:nth-child(2) { animation-delay: 0.4s; }
+        .departure-item:nth-child(3) { animation-delay: 0.5s; }
+        .departure-item:nth-child(4) { animation-delay: 0.6s; }
+        .departure-item:nth-child(5) { animation-delay: 0.7s; }
+        
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .departure-item:hover {
+            background: rgba(255,255,255,0.05);
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(255,107,53,0.2);
+        }
+        
+        .line-number {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--accent);
+            text-align: center;
+        }
+        
+        .destination {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        
+        .time {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-align: right;
+        }
+        
+        .time.minutes {
+            font-size: 1rem;
+            color: var(--text-dim);
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-dim);
+        }
+        
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+        
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+        
+        .error {
+            background: rgba(255,75,75,0.1);
+            border: 2px solid #ff4b4b;
+            color: #ffb3b3;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        
+        .refresh-btn {
+            display: block;
+            margin: 0 auto;
+            padding: 12px 30px;
+            background: var(--secondary);
+            color: var(--text);
+            border: none;
+            border-radius: 25px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(0,78,137,0.4);
+        }
+        
+        .refresh-btn:hover {
+            background: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 7px 25px rgba(255,107,53,0.5);
+        }
+        
+        .refresh-btn:active {
+            transform: translateY(0);
+        }
+        
+        @media (max-width: 600px) {
+            .station-name {
+                font-size: 2rem;
+            }
+            
+            .departure-item {
+                grid-template-columns: 60px 1fr 70px;
+                gap: 15px;
+                padding: 15px;
+            }
+            
+            .line-number {
+                font-size: 1.5rem;
+            }
+            
+            .destination {
+                font-size: 1rem;
+            }
+            
+            .time {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="stations-grid">
+            <div class="station-module">
+                <header>
+                    <h1 class="station-name">Flottbrovägen</h1>
+                </header>
+                
+                <div class="departures-container" id="departuresContainer">
+                    <div class="loading">Hämtar avgångar</div>
+                </div>
+            </div>
+            
+            <div class="station-module">
+                <header>
+                    <h1 class="station-name">Stora Essingen</h1>
+                </header>
+                
+                <div class="departures-container" id="departuresContainerTvarbanan">
+                    <div class="loading">Hämtar avgångar</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="last-updated" id="lastUpdated" style="text-align: center; margin-bottom: 20px;">Laddar...</div>
+        
+        <button class="refresh-btn" onclick="fetchDepartures()">Uppdatera båda</button>
+    </div>
+
+    <script>
+        // Site ID for Flottbrovägen, Stora Essingen (FBV)
+        // Coordinates: 59.322416, 17.990159
+        const SITE_ID = 1285;
+        const LINE_NUMBER = '1';
+        
+        // Site ID for Stora Essingen Tvärbanan (SES)
+        // Coordinates: 59.324107, 17.993764
+        const TVARBANAN_SITE_ID = 9811;
+        
+        let autoRefreshInterval;
+        
+        async function fetchBusDepartures() {
+            const container = document.getElementById('departuresContainer');
+            
+            try {
+                container.innerHTML = '<div class="loading">Hämtar avgångar</div>';
+                
+                const response = await fetch(`https://transport.integration.sl.se/v1/sites/${SITE_ID}/departures`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Filter for bus line 1 and exclude Stora Essingen destinations
+                const line1Departures = data.departures
+                    .filter(dep => 
+                        dep.line.designation === LINE_NUMBER && 
+                        dep.line.transport_mode === 'BUS' &&
+                        !dep.destination.toLowerCase().includes('stora essingen')
+                    )
+                    .slice(0, 5); // Get first 5 departures
+                
+                if (line1Departures.length === 0) {
+                    container.innerHTML = '<div class="error">Inga avgångar hittades för buss 1</div>';
+                    return;
+                }
+                
+                // Display departures
+                container.innerHTML = line1Departures.map(dep => {
+                    const expectedTime = new Date(dep.expected);
+                    const now = new Date();
+                    const diffMinutes = Math.round((expectedTime - now) / 60000);
+                    
+                    let timeDisplay;
+                    if (diffMinutes <= 0) {
+                        timeDisplay = '<span class="time">NU</span>';
+                    } else if (diffMinutes <= 20) {
+                        timeDisplay = `<span class="time minutes">${diffMinutes} min</span>`;
+                    } else {
+                        timeDisplay = `<span class="time">${expectedTime.toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' })}</span>`;
+                    }
+                    
+                    return `
+                        <div class="departure-item">
+                            <div class="line-number">${dep.line.designation}</div>
+                            <div class="destination">${dep.destination}</div>
+                            ${timeDisplay}
+                        </div>
+                    `;
+                }).join('');
+                
+            } catch (error) {
+                console.error('Error fetching departures:', error);
+                container.innerHTML = `
+                    <div class="error">
+                        <strong>Kunde inte hämta avgångar</strong><br>
+                        ${error.message}<br><br>
+                        <small>Kontrollera att Site ID är korrekt. För att hitta rätt Site ID, besök:<br>
+                        https://transport.integration.sl.se/v1/sites<br>
+                        och sök efter "Flottbrovägen"</small>
+                    </div>
+                `;
+            }
+        }
+        
+        async function fetchTvarbanaDepartures() {
+            const container = document.getElementById('departuresContainerTvarbanan');
+            
+            try {
+                container.innerHTML = '<div class="loading">Hämtar avgångar</div>';
+                
+                const response = await fetch(`https://transport.integration.sl.se/v1/sites/${TVARBANAN_SITE_ID}/departures`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Get all tram/light rail departures
+                const tvarbanaDepartures = data.departures
+                    .filter(dep => dep.line.transport_mode === 'TRAM')
+                    .slice(0, 5);
+                
+                if (tvarbanaDepartures.length === 0) {
+                    container.innerHTML = '<div class="error">Inga avgångar hittades för Tvärbanan</div>';
+                    return;
+                }
+                
+                // Display departures
+                container.innerHTML = tvarbanaDepartures.map(dep => {
+                    const expectedTime = new Date(dep.expected);
+                    const now = new Date();
+                    const diffMinutes = Math.round((expectedTime - now) / 60000);
+                    
+                    let timeDisplay;
+                    if (diffMinutes <= 0) {
+                        timeDisplay = '<span class="time">NU</span>';
+                    } else if (diffMinutes <= 20) {
+                        timeDisplay = `<span class="time minutes">${diffMinutes} min</span>`;
+                    } else {
+                        timeDisplay = `<span class="time">${expectedTime.toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' })}</span>`;
+                    }
+                    
+                    return `
+                        <div class="departure-item">
+                            <div class="line-number">${dep.line.designation}</div>
+                            <div class="destination">${dep.destination}</div>
+                            ${timeDisplay}
+                        </div>
+                    `;
+                }).join('');
+                
+            } catch (error) {
+                console.error('Error fetching Tvärbanan departures:', error);
+                container.innerHTML = `
+                    <div class="error">
+                        <strong>Kunde inte hämta avgångar</strong><br>
+                        ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        async function fetchDepartures() {
+            const lastUpdated = document.getElementById('lastUpdated');
+            
+            await Promise.all([
+                fetchBusDepartures(),
+                fetchTvarbanaDepartures()
+            ]);
+            
+            // Update last updated time once for both
+            const now = new Date();
+            lastUpdated.textContent = `Uppdaterad: ${now.toLocaleTimeString('sv-SE')}`;
+        }
+        
+        // Initial fetch
+        fetchDepartures();
+        
+        // Auto-refresh every 30 seconds
+        autoRefreshInterval = setInterval(fetchDepartures, 30000);
+        
+        // Clean up on page unload
+        window.addEventListener('beforeunload', () => {
+            clearInterval(autoRefreshInterval);
+        });
+    </script>
+</body>
+</html>

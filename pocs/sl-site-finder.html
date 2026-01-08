@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SL Site ID Finder</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        button {
+            background: #0074D9;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        
+        button:hover {
+            background: #0056b3;
+        }
+        
+        .results {
+            margin-top: 20px;
+        }
+        
+        .result-item {
+            padding: 15px;
+            margin: 10px 0;
+            background: #f9f9f9;
+            border-left: 4px solid #0074D9;
+            border-radius: 5px;
+        }
+        
+        .result-item strong {
+            color: #0074D9;
+        }
+        
+        .loading {
+            text-align: center;
+            color: #666;
+        }
+        
+        code {
+            background: #e0e0e0;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚌 SL Site ID Finder</h1>
+        <p>Sök efter en hållplats för att hitta dess Site ID</p>
+        
+        <input type="text" id="searchInput" placeholder="T.ex. Flottbrovägen, Slussen, T-Centralen..." />
+        <button onclick="searchSites()">Sök</button>
+        
+        <div id="results" class="results"></div>
+    </div>
+
+    <script>
+        let allSites = [];
+        
+        async function loadAllSites() {
+            try {
+                const response = await fetch('https://transport.integration.sl.se/v1/sites');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                allSites = await response.json();
+                console.log(`Loaded ${allSites.length} sites`);
+            } catch (error) {
+                console.error('Error loading sites:', error);
+                document.getElementById('results').innerHTML = `
+                    <div class="result-item" style="border-left-color: red;">
+                        <strong>Fel:</strong> Kunde inte hämta hållplatser. ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        function searchSites() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const resultsDiv = document.getElementById('results');
+            
+            if (!query) {
+                resultsDiv.innerHTML = '<p>Ange ett sökord</p>';
+                return;
+            }
+            
+            if (allSites.length === 0) {
+                resultsDiv.innerHTML = '<div class="loading">Laddar hållplatser...</div>';
+                return;
+            }
+            
+            const matches = allSites.filter(site => 
+                site.name.toLowerCase().includes(query)
+            );
+            
+            if (matches.length === 0) {
+                resultsDiv.innerHTML = `<p>Inga träffar för "${query}"</p>`;
+                return;
+            }
+            
+            resultsDiv.innerHTML = matches.map(site => `
+                <div class="result-item">
+                    <strong>${site.name}</strong><br>
+                    Site ID: <code>${site.id}</code><br>
+                    Koordinater: ${site.lat.toFixed(6)}, ${site.lon.toFixed(6)}<br>
+                    ${site.abbreviation ? `Förkortning: ${site.abbreviation}<br>` : ''}
+                </div>
+            `).join('');
+        }
+        
+        // Load sites on page load
+        loadAllSites();
+        
+        // Allow searching with Enter key
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                searchSites();
+            }
+        });
+    </script>
+</body>
+</html>
