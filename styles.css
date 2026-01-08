@@ -1,7 +1,7 @@
 @font-face {
   font-family: "SL Gothic";
   src: url("fonts/slgothictext2-regular.woff") format("woff"),
-       url("fonts/slgothictext2-regular.woff2") format("woff2");
+    url("fonts/slgothictext2-regular.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
 }
@@ -9,7 +9,7 @@
 @font-face {
   font-family: "SL Gothic";
   src: url("fonts/slgothictext2-bold.woff") format("woff"),
-       url("fonts/slgothictext2-bold.woff2") format("woff2");
+    url("fonts/slgothictext2-bold.woff2") format("woff2");
   font-weight: 700;
   font-style: normal;
 }
@@ -17,7 +17,7 @@
 @font-face {
   font-family: "SL Gothic Display";
   src: url("fonts/slgothicdisplay-bold.woff") format("woff"),
-       url("fonts/slgothicdisplay-bold.woff2") format("woff2");
+    url("fonts/slgothicdisplay-bold.woff2") format("woff2");
   font-weight: 700;
   font-style: normal;
 }
@@ -80,7 +80,7 @@ body::before {
   width: 100vw;
   height: 100vh;
   margin: 0;
-  padding: 10px;
+  padding: 20px 10px 10px 10px;
   position: relative;
   z-index: 1;
   box-sizing: border-box;
@@ -206,7 +206,8 @@ header {
 }
 
 .station-name {
-  font-family: "SL Gothic Display", "SL Gothic", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "SL Gothic Display", "SL Gothic", "Helvetica Neue", Helvetica,
+    Arial, sans-serif;
   font-size: 2rem;
   font-weight: bold;
   color: var(--primary);
@@ -401,10 +402,9 @@ header {
 .departure-info {
   font-size: 0.85rem;
   color: var(--text-dim);
-  margin-top: 5px;
-  padding-top: 8px;
+  margin-top: -3px;
   padding-left: 95px;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  text-align: right;
 }
 
 .departure-info.has-delay {
@@ -476,7 +476,7 @@ header {
 
 .countdown-timer {
   display: inline-block;
-  min-width: 23px;
+  min-width: 16px;
   text-align: right;
 }
 
